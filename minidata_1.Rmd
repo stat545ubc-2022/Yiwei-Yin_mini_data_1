@@ -4,7 +4,9 @@ author: "YY"
 date: "2022-10-07"
 output: html_document
 ---
-
+git push -f origin master
+library(datateachr)
+library(tidyverse)
 <!-------------------------- Start your work below ---------------------------->
 
 1: CHOICE_1\_apt_buildings\
@@ -22,7 +24,30 @@ output: html_document
 
 ```{r}
 ### EXPLORE HERE ###
-steam_games
+head(apt_buildings)
+class(apt_buildings)
+dim(apt_buildings)
+glimpse(apt_buildings)
+colnames(apt_buildings)
+apt_buildings
+
+head(building_permits)
+class(building_permits)
+dim(building_permits)
+glimpse(building_permits)
+colnames(building_permits)
+
+head(cancer_sample)
+class(cancer_sample)
+dim(cancer_sample)
+glimpse(cancer_sample)
+colnames(cancer_sample)
+
+head(parking_meters)
+class(parking_meters)
+dim(parking_meters)
+glimpse(parking_meters)
+colnames(parking_meters)
 ```
 
 <!----------------------------------------------------------------------------->
@@ -30,13 +55,15 @@ steam_games
 1.3 Now that you've explored the 4 datasets that you were initially most interested in, let's narrow it down to 2. What lead you to choose these 2? Briefly explain your choices below, and feel free to include any code in your explanation.
 
 <!-------------------------- Start your work below ---------------------------->
+1.3.1 I would like to choose "apt_buildings"as apt_building has different types of variables includes qualitative and quantitative variables. I am also very interested to see the relationship between apartment age and various characteristics. 
 
+1.3.2 I would like to also choose"cancer sample"as it can provide information regarding the relationship the diagnosis and sample parameters 
 <!----------------------------------------------------------------------------->
 
 1.4 Time for the final decision! Going back to the beginning, it's important to have an *end goal* in mind. For example, if I had chosen the `titanic` dataset for my project, I might've wanted to explore the relationship between survival and other variables. Try to think of 1 research question that you would want to answer with each dataset. Note them down below, and make your final choice based on what seems more interesting to you!
 
 <!-------------------------- Start your work below ---------------------------->
-
+I would like to choice "apt_building". The research question I have is: "What's the relationship between number of apartment units and the number of storeys" 
 <!----------------------------------------------------------------------------->
 
 # Important note
@@ -63,12 +90,59 @@ If we rewind and go back to the learning objectives, you'll see that by the end 
 2.2 For each of the 4 exercises that you complete, provide a *brief explanation* of why you chose that exercise in relation to your data (in other words, why does it make sense to do that?), and sufficient comments for a reader to understand your reasoning and code.
 
 <!-------------------------- Start your work below ---------------------------->
+# 1. Plot the distribution of a numeric variable.
+-In this analysis, I conduct a bar chart to describe the distribution of the year of apartment built. It will give us a good idea of which year has the highest number of apartment built.
+
+-In this code, I use  ggplot to draw the bar-char which I use the apt_building database and put year_built as x axis, and count as the y axis. I use geom_bar() to plot the data into a bar chart.I also change the name of x axis using the X lab. The result is stored as "no_variable".
+
+```{r}
+no_variable<- ggplot(apt_buildings,aes(year_built)) + geom_bar()+
+xlab("year apartment built")
+print(no_variable)
+```
+# 2.Explore the relationship between 2 variables in a plot.
+--In this analysis, I analysis the relationship between number of units and number of storeys, which turns out to have a positive relationship. It means as the number of units increases, the number of storeys also increases.We will expect apartments with more units can have more storeys. 
+
+-in the alaysis,I use ggplot and use apt_building database. I set no_of_units as x axis and no_of_storeys as y axis, I use geom_point() to create scatterplots and set the dot size to 0.75, I also use geom_smooth to add trend line and I use linear model(lm) with no confidence interval(se = False).The result is stored as var_relation
+
+```{r}
+var_relation<-ggplot(apt_buildings, aes(no_of_units,no_of_storeys)) +geom_point(size=0.75) +
+  geom_smooth(method = "lm", se = FALSE) +
+  xlab("number of units") +
+  ylab("number of storeys")
+print(var_relation)
+```
+# 3 Filter observations in your data according to your own criteria. Think of what you’d like to explore - again, if this was the titanic dataset, I may want to narrow my search down to passengers born in a particular year
+
+I would like to get a list of apartment without visitor parking, they are the apartments that I would like to avoid. 
+
+In my analysis, I filter the data with vistor_parking equal to "UNAVALIBLE" and store the new dataset as vis_unavali
+```{r}
+vis_unavali<-filter(apt_buildings, visitor_parking =="UNAVAILABLE")
+print(vis_unavali)
+```
+# 4 Use a density plot to explore any of your variables (that are suitable for this type of plot).
+I would like to get a distribution of number of storeys in three different types of property type.In this analysis I use ggplot and set the no_of_storeys as x axis, and use color to differentiate property_type. I use geom_density to generate density plot. 
+
+```{r}
+dens_units<-ggplot(apt_buildings,aes(x = no_of_storeys, color=property_type)) + geom_density()
+xlab("nomber of storeys")
+print(dens_units)
+```
 
 <!----------------------------------------------------------------------------->
 
 # Task 3: Write your research questions (5 points)
 
 So far, you have chosen a dataset and gotten familiar with it through exploring the data. Now it's time to figure out 4 research questions that you would like to answer with your data! Write the 4 questions and any additional comments at the end of this deliverable. These questions are not necessarily set in stone - TAs will review them and give you feedback; therefore, you may choose to pursue them as they are for the rest of the project, or make modifications!
+
+# Research question 1: Do The aprtments in the city has more apartment with storeys more than 7 than apartment with storeys between(4-7) and apartment with storey less than 4 
+
+# Reserach question 2:Do The apartments with visitor parking in general has more number of accessible parking?
+
+# Reserach question 3: Among different property type, do the apartment with more units tend to have more storeys?
+
+# Reseasrch question 4: Is there any difference in the number of apartments among different property type regarding visitor parking type?
 
 <!--- *****START HERE***** --->
 
@@ -99,7 +173,92 @@ Ensure that the output of each operation is printed!
 Make sure it's clear what research question you are doing each operation for!
 
 <!------------------------- Start your work below ----------------------------->
+# 1 The aprtments in the city has more apartment with storeys more than 7 than apartment with storeys between(4-7) and apartment with storey less than 4.
 
+*1.1 create categorical variable with "low storey":(storeys <4), "medium storey":(4~storey~7), "high storey":(storey>7)
+*1.2 create a bar chart to compare the the number of apartments belong to 3 category. the best one would be R2 which has clear edge and reasonalbe distance between columns.
+
+```{r}
+storey_variable <- cut(apt_buildings$no_of_storeys,
+                      breaks=c(-Inf,4, 7, Inf),
+                       labels=c('Low', 'Medium', 'high'))
+apt_buildings$storeys_height<-factor(storey_variable)
+apt_buildings
+
+
+R1.1<-ggplot(apt_buildings,aes(storey_variable)) + geom_bar() +
+  theme_classic() +
+  xlab("number of storey")
+print(R1.1)
+
+R1.2<-ggplot(apt_buildings,aes(storey_variable)) + geom_bar(width = 0.5) +
+  theme_classic()+
+  xlab("number of storey")
+print(R1.2)
+
+R1.3<-ggplot(apt_buildings,aes(storey_variable)) + geom_bar(width = 1) +
+  theme_classic()+
+  xlab("number of storey")
+print(R1.3)
+
+```
+# 2 Do The apartments with visitor parking in general has more number of accessible parking?.
+*1.1 filter the visitor parking type ("UNAVALIABLE") and then summarize the data to get the mean, median, quantile and range of the nunber of accessible parking spaces in the group with unavaliable visitor parking
+
+*1.2 create a density graph to compare the distribution of the different groups of visitor parking type, to make it easier to compare, the density plot was filled with color which alpha is set to 0.5. 
+```{r}
+R2<-apt_buildings %>%
+  filter(visitor_parking == "UNAVAILABLE")
+print(R2)
+
+R2.mean<-mean(R2$no_of_accessible_parking_spaces,na.rm= TRUE)
+R2.mean
+R2.range<-range(R2$no_of_accessible_parking_spaces,na.rm= TRUE)
+R2.range
+R2.median<-median(R2$no_of_accessible_parking_spaces,na.rm= TRUE)
+R2.median
+R2.quantile<-quantile(R2$no_of_accessible_parking_spaces,na.rm= TRUE)
+R2.quantile
+
+R2.graph<-ggplot(apt_buildings, aes(no_of_accessible_parking_spaces,fill=visitor_parking,)) +
+    geom_density( alpha = 0.5)
+print(R2.graph)
+
+```
+# Research question 3:Among different property type, do the apartment with more units tend to have more storeys?
+3.1 To get a better understanding of the number of three different type of property, I summarize the number of each property.
+3.2 To get the relationship of number of storeys and number of units, I generate a scatter plot with x axis as number of storeys and y axis as the number of units. I seperate dots by property type and add a trend line to get the relationship of number of storeys and number of units for each property. 
+
+```{r}
+R3 <-apt_buildings %>% 
+  group_by(property_type) %>%
+  summarize(number_rows= n())
+print(R3)
+
+R3.graph <- ggplot(apt_buildings, aes(x = no_of_storeys, y = no_of_units)) +
+       geom_point(shape = 21, alpha = 0.2,
+                  aes( fill = property_type,),
+                  ) +geom_smooth(aes(color = property_type))
+print(R3.graph)
+```
+# Reseasrch question 4: Is there any difference in the number of apartments among different property type regarding visitor parking type.
+4.1 In the summarize analysis, I get the number of apartments with different visitor parking type, the apartment with no information regarding visitor parking is excluded.
+4.2 I develop a plot using dot chart to describe the frequncies of two categorical variables, the dot transparency is set to 0.5 for better visualization. 
+```{r}
+R4 <-apt_buildings %>% drop_na(visitor_parking) %>%
+  group_by(visitor_parking) %>%
+  summarize(number_rows= n())
+print(R4)
+
+R4.graph<-apt_buildings %>% drop_na(visitor_parking) %>%
+ggplot(aes(property_type,visitor_parking)) +
+  geom_jitter(aes(color = property_type), size = 0.3, alpha=0.5) +
+  theme_classic()+
+  xlab("property type")+
+  ylab("visitor parking type") 
+R4.graph
+```
+ 
 <!----------------------------------------------------------------------------->
 
 ### 1.2 (3 points)
@@ -107,7 +266,7 @@ Make sure it's clear what research question you are doing each operation for!
 Based on the operations that you've completed, how much closer are you to answering your research questions? Think about what aspects of your research questions remain unclear. Can your research questions be refined, now that you've investigated your data a bit more? Which research questions are yielding interesting results?
 
 <!-------------------------- Start your work below ---------------------------->
-
+*I think the operation I performed pretty closely answer my research question. In the graph, they have good layout that related to my research question. I think for question 2, my operation has not fully answer the research question as the distribution of number of accessible parking has be overlapping and can not be distinguished. I think the question can be modified as : Do apartment with visitor parking more likely to get accessible parking. So in the analysis I can analysis the frequency of the apartments with different combination of parking types.  I think question 3 has interesting result as it has a very clear positive correlation between number of units and number of storeys among different property. 
 <!----------------------------------------------------------------------------->
 
 ### Attribution
